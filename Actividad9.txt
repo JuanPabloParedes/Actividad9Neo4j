@@ -214,4 +214,7 @@ Además, se evidenció la importancia de las relaciones en los grafos y cómo es
 Repositorio GitHub:
 https://github.com/JuanPabloParedes/Actividad9Neo4j.git
 
+Anexos:
+Las capturas de ejecución de consultas y la estructura de archivos CSV se encuentran incluidas en el repositorio GitHub.
+
 Fin del documento.
