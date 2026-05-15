@@ -1,0 +1,217 @@
+ACTIVIDAD 9
+BASES DE DATOS ORIENTADAS A GRAFOS EN NEO4J
+
+Estudiante:
+Juan Pablo Paredes Gomez
+
+Código:
+2248797
+
+------------------------------------------------------------
+
+DESCRIPCIÓN DEL PROYECTO
+
+El presente proyecto consiste en la implementación de una base de datos orientada a grafos utilizando Neo4j y el lenguaje Cypher. El sistema modela un entorno turístico inteligente en el que se representan usuarios, lugares, ciudades, eventos, alojamientos e intereses mediante nodos y relaciones.
+
+El objetivo principal es demostrar el uso de bases de datos de grafos para realizar consultas complejas y sistemas de recomendación basados en afinidades, intereses y conexiones entre entidades.
+
+------------------------------------------------------------
+
+NODOS UTILIZADOS
+
+- Usuario
+- Lugar
+- Ciudad
+- Evento
+- Alojamiento
+- Interes
+
+Ejemplos de nodos creados:
+
+Usuario:
+- Juan Pérez
+- Maria Lopez
+
+Ciudad:
+- Cali
+- Bogota
+- Medellin
+- Cartagena
+
+Lugar:
+- Museo La Tertulia
+- Restaurante Gourmet
+
+Evento:
+- Festival Petronio
+
+Alojamiento:
+- Hotel Pacific
+
+Interes:
+- #Gourmet
+------------------------------------------------------------
+
+RELACIONES UTILIZADAS
+
+- VISITÓ
+- DEFINE_ESTILO
+- SITUADO_EN
+- AFÍN_A
+- PROMUEVE
+- CONOCE_A
+- SE_HOSPEDÓ
+
+Ejemplos de relaciones creadas:
+
+(Usuario)-[:VISITÓ]->(Lugar)
+
+(Lugar)-[:DEFINE_ESTILO]->(Interes)
+
+(Evento)-[:PROMUEVE]->(Interes)
+
+(Usuario)-[:AFÍN_A]->(Interes)
+
+(Usuario)-[:CONOCE_A]->(Usuario)
+
+(Usuario)-[:SE_HOSPEDÓ]->(Alojamiento)
+
+(Alojamiento)-[:SITUADO_EN]->(Ciudad)
+------------------------------------------------------------
+
+CONSULTA 1
+
+Objetivo:
+Identificar los intereses que más definen los lugares visitados por un usuario específico.
+
+Código:
+
+MATCH (u:Usuario {nombre:'Juan Pérez'})-[:VISITÓ]->(l:Lugar)
+MATCH (l)-[:DEFINE_ESTILO]->(i:Interes)
+RETURN i.nombre AS interes, COUNT(i) AS cantidad
+ORDER BY cantidad DESC
+
+------------------------------------------------------------
+
+CONSULTA 2
+
+Objetivo:
+Consultar los lugares visitados y favoritos de un turista en una ciudad específica.
+
+Código:
+
+MATCH (u:Usuario {nombre:'Juan Pérez'})-[v:VISITÓ]->(l:Lugar)
+MATCH (l)-[:SITUADO_EN]->(c:Ciudad {nombre:'Cali'})
+RETURN l.nombre AS lugar,
+v.es_favorito AS favorito,
+c.nombre AS ciudad
+
+------------------------------------------------------------
+
+CONSULTA 3
+
+Objetivo:
+Identificar los lugares más populares de una ciudad.
+
+Código:
+
+MATCH (u:Usuario)-[:VISITÓ]->(l:Lugar)
+MATCH (l)-[:SITUADO_EN]->(c:Ciudad {nombre:'Cali'})
+RETURN l.nombre AS lugar,
+COUNT(u) AS total_visitas
+ORDER BY total_visitas DESC
+
+------------------------------------------------------------
+
+CONSULTA 4
+
+Objetivo:
+Consultar los alojamientos con presencia en más de tres ciudades.
+
+Código:
+
+MATCH (a:Alojamiento)-[:SITUADO_EN]->(c:Ciudad)
+
+WITH a, COUNT(c) AS total_ciudades
+
+WHERE total_ciudades > 3
+
+RETURN a.nombre AS alojamiento,
+total_ciudades
+
+------------------------------------------------------------
+
+CONSULTA 5
+
+Objetivo:
+Recomendar lugares según intereses de sitios visitados previamente.
+
+Código:
+
+MATCH (u:Usuario {nombre:'Juan Pérez'})-[:VISITÓ]->(l1:Lugar)
+MATCH (l1)-[:DEFINE_ESTILO]->(i:Interes)
+MATCH (l2:Lugar)-[:DEFINE_ESTILO]->(i)
+
+WHERE NOT (u)-[:VISITÓ]->(l2)
+AND l1 <> l2
+AND i.nombre = '#Gourmet'
+
+RETURN DISTINCT
+l2.nombre AS lugar_recomendado,
+i.nombre AS interes
+
+------------------------------------------------------------
+
+CONSULTA 6
+
+Objetivo:
+Recomendar eventos según afinidades del usuario.
+
+Código:
+
+MATCH (u:Usuario {nombre:'Juan Pérez'})-[a:AFÍN_A]->(i:Interes)
+MATCH (e:Evento)-[:PROMUEVE]->(i)
+
+WHERE e.sold_out = false
+AND i.nombre = '#Gourmet'
+
+RETURN
+e.nombre AS evento,
+i.nombre AS interes,
+a.nivel_afinidad AS afinidad
+
+ORDER BY afinidad DESC
+
+------------------------------------------------------------
+
+CONSULTA 7
+
+Objetivo:
+Recomendar alojamientos según experiencias de amigos.
+
+Código:
+
+MATCH (u:Usuario {nombre:'Juan Pérez'})-[:CONOCE_A]->(amigo:Usuario)
+MATCH (amigo)-[:SE_HOSPEDÓ]->(a:Alojamiento)
+MATCH (a)-[:SITUADO_EN]->(c:Ciudad {nombre:'Cali'})
+
+WHERE NOT (u)-[:SE_HOSPEDÓ]->(a)
+
+RETURN DISTINCT
+a.nombre AS alojamiento,
+c.nombre AS ciudad
+
+------------------------------------------------------------
+
+CONCLUSIONES
+
+El desarrollo de esta actividad permitió comprender el funcionamiento de las bases de datos orientadas a grafos mediante Neo4j y el lenguaje Cypher. Se logró modelar relaciones complejas entre entidades turísticas y construir consultas avanzadas para sistemas de recomendación basados en intereses, afinidades y conexiones entre usuarios.
+
+Además, se evidenció la importancia de las relaciones en los grafos y cómo estas permiten obtener información contextual de manera más eficiente en comparación con modelos relacionales tradicionales.
+
+------------------------------------------------------------
+
+Repositorio GitHub:
+https://github.com/JuanPabloParedes/Actividad9Neo4j.git
+
+Fin del documento.
